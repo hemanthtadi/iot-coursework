@@ -1,0 +1,56 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    command: ["mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]
+    restart: unless-stopped
+
+  collector:
+    image: data-collector:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iot-collector
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  yolo-detector:
+    build:
+      context: ./yolo-detector
+    container_name: yolo-detector
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  predictor:
+    build:
+      context: ./predictor
+    container_name: predictor
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+    volumes:
+      - ./output:/output
+
+  classifier:
+    build:
+      context: ./classifier
+    container_name: classifier
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+    volumes:
+      - ./output:/output
+
+  decision:
+    build:
+      context: ./decision
+    container_name: decision
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
