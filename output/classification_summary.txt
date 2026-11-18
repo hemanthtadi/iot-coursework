@@ -1,5 +1,5 @@
 Quality
-YELLOW    46370
-RED       12782
-GREEN        48
+YELLOW    16963
+RED        5117
+GREEN        20
 Name: count, dtype: int64
